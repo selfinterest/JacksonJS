@@ -1,0 +1,30 @@
+{
+  "name": "JacksonJS",
+  "version": "0.0.0",
+  "description": "REST for Express",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "underscore": "^1.6.0",
+    "grunt": "^0.4.4",
+    "walk": "^2.3.1",
+    "glob": "^3.2.9",
+    "winston": "^0.7.3",
+    "line-by-line": "^0.1.1",
+    "q": "^1.0.1"
+  },
+  "devDependencies": {
+    "sinon-chai": "^2.5.0",
+    "sinon": "^1.9.0",
+    "chai": "^1.9.1",
+    "grunt-simple-mocha": "^0.4.0",
+    "grunt-mocha-test": "^0.10.0",
+    "karma": "^0.12.1",
+    "karma-mocha-reporter": "^0.2.2",
+    "matchdep": "^0.3.0"
+  }
+}

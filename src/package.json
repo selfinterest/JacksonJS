@@ -1,0 +1,2 @@
+{ "name" : "jackson-js",
+  "main" : "./lib/jackson-js.js" }
