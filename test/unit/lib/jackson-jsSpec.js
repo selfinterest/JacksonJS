@@ -28,9 +28,11 @@ describe("JacksonJS instantiation test", function(){
 
   it("should be able to get a list of resource files", function(){
     var JacksonBase = require("../../../src");
+
     var Jackson = JacksonBase({
       resourcePath: "resources"
     });
+
     var app = {};
     var sinon = require("sinon");
     var spy = sinon.spy(JacksonBase.utils, "getResources");
@@ -39,7 +41,6 @@ describe("JacksonJS instantiation test", function(){
     var spyCall = spy.getCall(0);
     expect(spyCall.calledWith("resources")).to.be.true;
     expect(jackson.resources).to.not.be.empty;
-    console.log(jackson.resources);
 
   });
 });

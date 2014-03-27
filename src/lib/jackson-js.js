@@ -6,22 +6,29 @@
 
 var path = require("path"), _ = require("underscore"), Q = require("q");
 
-var NoResourcesException = require("./jackson-exceptions").NoResourcesException;
-var ResourceParser = require("./jackson-resource-parser");
+var NoResourcesException = require("./exceptions/jackson-exceptions").NoResourcesException;
+var ResourceParser = require("./resource/jackson-resource-parser");
 
 function JacksonConstructor(options, app){
   this.options = options;
   this.app = app;
 
-  this.resources = Jackson.utils.getResources(this.options.resourcePath);
+  this.resourceFiles = Jackson.utils.getResourceFiles(this.options.resourcePath);
 
-  if(this.resources.length < 1){
+  if(this.resourceFiles.length < 1){
     throw new NoResourcesException(options);
   }
 
   //_.each()
   //Now that we've got the resources, what do we do with them?
 }
+
+/**
+ * Starts Jackson. Should return a promise that is only fulfilled when EVERYTHING is done.
+ */
+JacksonConstructor.prototype.start = function(){
+
+};
 
 /**
  * Asynchronously parse loaded resources
