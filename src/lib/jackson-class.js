@@ -4,16 +4,25 @@
  * Time: 10:32 AM
  */
 var NoResourcesException = require("./exceptions/jackson-exceptions").NoResourcesException;
-var Jackson = require("./jackson-js");
+var utils = require("./jackson-utils.js");
 
 function JacksonConstructor(options, app){
   this.options = options;
   this.app = app;
 
-  this.resourceFiles = Jackson.utils.getResourceFiles(this.options.resourcePath);
+  this.resources = utils.getResources(this.options.resourcePath);
 
-  if(this.resourceFiles.length < 1){
+  if(this.resources.length < 1){
     throw new NoResourcesException(options);
   }
 
 }
+
+/**
+ * Starts Jackson. Should return a promise that is only fulfilled when EVERYTHING is done.
+ */
+JacksonConstructor.prototype.start = function(){
+
+};
+
+module.exports = JacksonConstructor;

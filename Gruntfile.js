@@ -11,15 +11,33 @@ module.exports = function (grunt) {
       mochaTest: {
         unit: {
           options: {
-            reporter: 'spec'
+            reporter: 'spec',
+            clearRequireCache: true
           },
           src: ['test/unit/**/*.js'],
           files: {
             rootDirectory: '../../../'
           }
         }
+      },
+      watch: {
+        scripts: {
+          options: {
+            spawn: true
+          },
+          files: ['src/lib/**/*.js', 'test/unit/**/*.js'],
+          tasks: ["test:unit"]
+        },
+        
       }
     //}
   });
+  /*var defaultTestSrc = grunt.config('mochaTest.unit.src');
+  grunt.event.on('watch', function(action, filepath){
+    grunt.config('mochaTest.unit.src', defaultTestSrc);
+    if (filepath.match('unit/')){
+      grunt.config('mochaTest.unit.src', filepath);
+    }
+  });*/
   grunt.registerTask('test:unit', ['mochaTest:unit']);
 };

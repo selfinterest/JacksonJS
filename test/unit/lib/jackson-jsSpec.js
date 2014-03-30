@@ -27,15 +27,15 @@ describe("JacksonJS instantiation test", function(){
   });
 
   it("should be able to get a list of resource files", function(){
-    var JacksonBase = require("../../../src");
-
-    var Jackson = JacksonBase({
+    var utils = require("../../../src/lib/jackson-utils.js");
+    var Jackson = require("../../../src")({
       resourcePath: "resources"
     });
 
+
     var app = {};
     var sinon = require("sinon");
-    var spy = sinon.spy(JacksonBase.utils, "getResources");
+    var spy = sinon.spy(utils, "getResources");
     var jackson = Jackson({});
 
     var spyCall = spy.getCall(0);

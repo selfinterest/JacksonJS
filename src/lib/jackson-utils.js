@@ -3,29 +3,29 @@ var glob = require("glob"),
   _ = require("underscore"),
   Resource = require("./resource/jackson-resource"),
   ResourceParser = require("./resource/jackson-resource-parser"),
+  ResourceCollection = require("./resource/jackson-resource-collection");
   Q = require("q");
 
-module.exports = {
-  getResourceFiles: function(resourcePath){
-    var resourceGlobPattern = path.resolve(resourcePath, "**") + "/*.js";
-    var files = glob.sync(resourceGlobPattern), resources = [];
+exports.getResources = function(resourcePath){
+  var resourceGlobPattern = path.resolve(resourcePath, "**") + "/*.js";
+  var files = glob.sync(resourceGlobPattern), resources = [];
+  var resourceCollection = new ResourceCollection();
 
-    resources = files.map(function(file){
-      return new Resource(file);
-    });
+  _.each(files, function(file){
+    resourceCollection.add(new Resource(file));
+  });
 
-    return resources;
-  },
+  return resourceCollection;
+}
 
-  parseResources: function(resources){
-    var promises = resources.map(function(r){
-      return ResourceParser.parse(r);
-    });
+exports.parseResources = function(resources){
+  var promises = resources.map(function(r){
+    return ResourceParser.parse(r);
+  });
 
-    return Q.all(promises);
-  },
+  return Q.all(promises);
+}
 
-  createReadStream: function(path){
+exports.createReadStream = function(path){
 
-  }
 }

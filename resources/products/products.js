@@ -7,15 +7,15 @@
 
 
 //= @path /products
-function Route(){
+	function Products(){
 
-}
+	}
 
 //= @GET
 //= @path {/?}
-Route.prototype.getProducts = function(req, res){
-  res.send("Sending products.");
-};
+	Products.prototype.getProducts = function(req, res){
+  		res.send("Sending products.");
+	};
 
 
-module.exports = Route;
+module.exports = Products;
