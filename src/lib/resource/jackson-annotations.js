@@ -25,6 +25,9 @@ Annotation.types.method = ["GET", "POST", "PUT", "DELETE", function(app, module,
     if(thePath.length > 1 && thePath.slice(thePath.length - 1) == "/") {    //remove ending slash
         thePath = thePath.slice(0, thePath.length - 1);
     }
+
+    //Also, if there are two slashes at the beginning, replace them with one
+    thePath = thePath.replace(/\/\//, "/");
     console.log("Adding "+thePath+", with method: "+annotation.type);
     app[annotation.type.toLowerCase()](thePath, module[script.functionToCall]);
 }];

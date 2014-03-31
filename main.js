@@ -11,6 +11,6 @@
 
  var express = require('express');
  var app = express();
- Jackson(app);
+ Jackson(app);      //routes all set up!
 
  app.listen(3000);

@@ -20,11 +20,23 @@
         res.send("Sending products.");
 	};
 
+    //= @GET
+    //= @path /something
+    Products.prototype.getOneSpecificProduct = function(req, res){
+        res.send("One specific product, called something.");
+    };
+    //= @GET
+    //= @path /:id
+    Products.prototype.getOneProduct = function(req, res){
+        res.send("Sending one product, with an id of "+req.params.id);
+    };
+
     //= @POST
     //= @path /
     Products.prototype.makeProduct = function(req, res){
         res.send("Making a product");
     };
+
 
     //= @PUT
     //= @path /:id
@@ -35,7 +47,7 @@
     Products.prototype.notAnnotatedAgain = function(){
 
     };
-    
+
     //= @DELETE
     //= @path /:id
     Products.prototype.deleteProduct = function(req, res){
