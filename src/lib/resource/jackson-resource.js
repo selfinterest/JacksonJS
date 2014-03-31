@@ -3,7 +3,8 @@
 
 var fs = require("fs"), utils = require("../jackson-utils.js"), byline = require("byline"),
 	path = require("path"), Q = require("q"), ResourceStream = require("./jackson-resource-stream.js"),
-	acorn = require("acorn"), Annotation = require("./jackson-annotations.js");
+	acorn = require("acorn"), Annotation = require("./jackson-annotations.js"), _ = require("underscore"),
+    ScriptBlock = require("../script-block/jackson-script-block.js"), ScriptBlockCollection = require("../script-block/jackson-script-block-collection.js");
 
 
 function Resource(filename){
@@ -14,7 +15,9 @@ function Resource(filename){
   //this.file = fs.createReadStream(this.filename);
 
   this.annotations = [];
-  this.stream = byline.createStream(fs.createReadStream(this.filename, {encoding: "utf8"}));
+
+
+  this.stream = byline.createStream(fs.createReadStream(this.filename, {encoding: "utf8"}), {keepEmptyLines: true});
 
   this.script = acorn.parse(fs.readFileSync(this.filename, "utf8"),
     {
@@ -24,9 +27,50 @@ function Resource(filename){
                 my.annotations.push(Annotation.fromLine(locationStart.line, text));
             }
         }
+  }).body;  //an array
+
+  //So now we have a list of annotations, and an array of script blocks.
+
+  //Filter the script blocks down so only type == "FunctionDeclaration" and type == "ExpressionStatement" remain.
+
+  this.script = _.filter(this.script, function(s){
+    return s.type == "FunctionDeclaration" || s.type == "ExpressionStatement";
   });
 
-  //So now we've got a map of the annotations. Yay!
+  //ScriptBlock.setAnnotations(my.annotations);
+  this.scriptBlocks = new ScriptBlockCollection(this.script.map(function(s){
+    return ScriptBlock(s);
+  }));
+
+  //The script block collection is complete. Now find out which blocks are annotated.
+  this.scriptBlocks.assignAndParseAnnotations(my.annotations);
+  
+  //So now we have a collection of script blocks and each is annotated.
+  /*console.log(this.scriptBlocks.blocks[0]);
+  console.log(this.scriptBlocks.blocks[1]);
+  console.log(this.scriptBlocks.blocks[2]);
+  console.log(this.scriptBlocks.blocks[this.scriptBlocks.blocks.length - 1 ]);*/
+
+  //
+  /*this.scriptBlocks = this.script.map(function(s){
+    return ScriptBlock(s);
+  });*/
+
+
+  //console.log(this.script);  
+
+
+  //So now we've got a map of the annotations. Yay! Can it be turned into function blocks?
+
+  //@annotation
+  //function  -- acorn identifies this as type FunctionDeclaration
+
+  //OR
+
+  //@annotation
+  //Resource.prototype.function -- acorn identifies this as type ExpressionStatement
+
+
 
 
 
@@ -38,11 +82,11 @@ Resource.prototype.parsed = function(){
 };
 
 Resource.prototype.parse = function(){
-	var resourceStream = new ResourceStream({encoding: "utf8"}), deferred = Q.defer();
+	var resourceStream = new ResourceStream({encoding: "utf8", objectMode: true, script: this.script, annotations: this.annotations}), deferred = Q.defer();
 	this.stream.pipe(resourceStream);
 
 	resourceStream.on("data", function(chunk){
-		console.log(chunk);
+		
 	});
 
 	resourceStream.on("end", function(){

@@ -5,6 +5,7 @@
  */
 var util = require("util");
 var Transform = require('stream').Transform;
+var Q = require("q");
 util.inherits(ResourceStream, Transform);
 
 function ResourceStream(options){
@@ -12,31 +13,109 @@ function ResourceStream(options){
     return new ResourceStream(options);
   }
 
+
   Transform.call(this, options);
+
+  this.annotatedblocks = [];
+
   this._annotations = [];
   this._annotatedBlock = false;
+  this._blockType = null;
+  this._lineCount = 1;      //important: acorn lines are not 0 indexed!
+
+  this.script = options.script;
+  this.annotations = options.annotations;
   if(!options) options = {};
 
 }
 
-ResourceStream.prototype._transform = function(chunk, encoding, done){
-	var annotation;
+ResourceStream.prototype.mapAnnotationsToLine = function(script, line){
+    var my = this, promises = [];
+    var blockStart = script.loc.start.line;
+    //Only two types of blocks can be annotated: FunctionDeclaration, ExpressionStatement. If it isn't one of those, we can ignore it.
+
+    if(script.type == "FunctionDeclaration" || script.type == "ExpressionStatement"){
+        //Is the block annotated? Basically, are there annotations with higher line numbers?
+        //We need to go through the annotations!
+        my.annotations.forEach(function(a){
+            if(a.lineNumber > blockStart){
+                promises.push({
+                    annotations: a,
+                    script: script
+                });
+                console.log(promises[promises.length -1 ]);
+            }
+        });
+
+        return promises;
+        //return Q.all(_.filter(my.annotations, function(a){
+        //    return a.lineNumber > blockStart;
+        //}));
+    } else {
+        return null;
+    }
+
+    
+    
+    //console.log(script);
+    //return false;
+};
+
+ResourceStream.prototype._transform = function(line, encoding, done){
+	var annotation, my = this, promises = [];
+
 	//Each chunk is a line.
-	chunk = chunk.toString().trim();		//remove spaces/tabs on either side
-	//If the line is an annotation line, it will look like this: //= @{theAnnotation}
-	if(chunk.slice(0, 5) == "//= @") {
+	//We need to go through the script map until we find a match for this line.
+
+    line = line.toString().trim();
+
+    this.script.forEach(function(s){
+        var annotations;
+        if(s.loc.start.line === my._lineCount){
+            annotations = my.mapAnnotationsToLine(s, line);
+            if(annotations){
+                my.push(annotations);
+            }
+        }
+    });
+
+    this._lineCount++;
+    done();
+
+    /*var promises = this.script.map(function(s){
+        if(s.loc.start.line === my._lineCount) {        //this line contains some kind of JavaScript block: a function, an expression, whatever
+                           
+            /*return my.mapAnnotationsToLine(s, line).then(function(annotations){        //send the type, as well as the line
+                console.log(annotations);
+                return annotations;
+            });*/
+    //    } else {
+    //        return null;
+    //    }
+    //});
+
+    /*Q.all(promises).then(function(){
+        my._lineCount++;
+        done();
+    });*/
+
+    //chunk = chunk.toString().trim();		//remove spaces/tabs on either side
+	
+    //If the line is an annotation line, it will look like this: //= @{theAnnotation}
+	/*if(chunk.slice(0, 5) == "//= @") {
 		this._annotatedBlock = true;
 		annotation = chunk.slice(4);
 		this._annotations.push(annotation);
 	} else if (this._annotatedBlock){
 		//Not an annotation. But if we're in an annotated block, we need to pay attention.
 		if(chunk.slice(0, 8) == "function"){
-			this._cu
+			this._blockType == "function";
 			//The name of this function will tell us the name of this resource
 
 		}
-	}
-  this.push(chunk);
-  done();
-}
+	}*/
+  
+  //this.push(line);
+  //done();
+};
 module.exports = ResourceStream;

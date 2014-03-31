@@ -14,6 +14,25 @@ describe("JacksonJS resource", function(){
         expect(resource.annotations[0].type).to.equal("PATH");
         expect(resource.annotations[1].type).to.equal("GET");
         expect(resource.annotations[0].body).to.equal("/products");
+        expect(resource.annotations[1].body).to.equal(null);
+
+        expect(resource.scriptBlocks.blocks).to.be.an("array");
+
+        var ScriptBlockCollection = require("../../../src/lib/script-block/jackson-script-block-collection.js");
+        expect(resource.scriptBlocks).to.be.an.instanceof(ScriptBlockCollection);
+
+        expect(resource.scriptBlocks.blocks[0].annotations.length).to.equal(0);
+        expect(resource.scriptBlocks.blocks[1].annotations.length).to.equal(1); //one annotation. See products.js.
+        expect(resource.scriptBlocks.blocks[2].annotations.length).to.equal(2);
+
+        var scriptBlocksLength = resource.scriptBlocks.blocks.length;
+
+        //The last two blocks should have no annotations
+        expect(resource.scriptBlocks.blocks[scriptBlocksLength - 1].annotations.length).to.equal(0);
+        expect(resource.scriptBlocks.blocks[scriptBlocksLength - 2].annotations.length).to.equal(0);
+        expect(resource.scriptBlocks.blocks[scriptBlocksLength - 3].annotations.length).to.equal(2);
+        expect(resource.scriptBlocks.blocks[scriptBlocksLength - 4].annotations.length).to.equal(0);
+        expect(resource.scriptBlocks.blocks[scriptBlocksLength - 5].annotations.length).to.equal(2);
     });
 
 	describe("parse tests -- asynchronous", function(){
@@ -24,7 +43,7 @@ describe("JacksonJS resource", function(){
 			resource = new Resource(resourcePath);
 		});
 
-		it("should be able to find the name of the resource", function(done){
+		xit("should be able to find the name of the resource", function(done){
 			
 
             resource.parse().then(function(parsedResource){

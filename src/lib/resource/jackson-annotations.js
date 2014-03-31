@@ -40,7 +40,6 @@ Annotation.getBody = function(text){
 };*/
 
 
-
 exports.fromLine = function(lineNumber, lineText){
     var type = Annotation.getType(lineText);
     var body = Annotation.getBody(lineText);
