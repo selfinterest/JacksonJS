@@ -4,6 +4,7 @@
  * Time: 10:32 AM
  */
 var NoResourcesException = require("./exceptions/jackson-exceptions").NoResourcesException;
+var Annotations = require("./resource/jackson-annotations.js");
 var utils = require("./jackson-utils.js");
 
 function JacksonConstructor(options, app){
@@ -11,12 +12,18 @@ function JacksonConstructor(options, app){
   this.app = app;
 
   this.resources = utils.getResources(this.options.resourcePath);
-
+  //We have the resources, complete with functions, annotations, etc.
+  
   if(this.resources.length < 1){
     throw new NoResourcesException(options);
   }
+  this.resources.compile(app);
 
 }
+
+JacksonConstructor.prototype.compileResources = function(){
+
+};
 
 /**
  * Starts Jackson. Should return a promise that is only fulfilled when EVERYTHING is done.

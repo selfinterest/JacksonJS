@@ -43,38 +43,28 @@ function Resource(filename){
   }));
 
   //The script block collection is complete. Now find out which blocks are annotated.
-  this.scriptBlocks.assignAndParseAnnotations(my.annotations);
+  this.name = this.scriptBlocks.assignAndParseAnnotations(my.annotations);
+
+  if(!this.name){
+    throw new Error("No name was found for resource: "+this.filename);
+  }
+
+  //Find the base path for the resource, and we're done here
+  this.scriptBlocks.blocks.forEach(function(b){
+    var pathAnnotation = null;
+    if(b.name && b.isAnnotated()){
+      pathAnnotation = b.hasPathAnnotation();
+      if(pathAnnotation !== null){
+        my.basePath = pathAnnotation.body;
+      }    
+    }
+  });
+
+  if(!my.basePath) my.basePath = "/";     //Or maybe this should throw an error
+
+
+  //utils.checkScriptBlocks(this.scriptBlocks);  
   
-  //So now we have a collection of script blocks and each is annotated.
-  /*console.log(this.scriptBlocks.blocks[0]);
-  console.log(this.scriptBlocks.blocks[1]);
-  console.log(this.scriptBlocks.blocks[2]);
-  console.log(this.scriptBlocks.blocks[this.scriptBlocks.blocks.length - 1 ]);*/
-
-  //
-  /*this.scriptBlocks = this.script.map(function(s){
-    return ScriptBlock(s);
-  });*/
-
-
-  //console.log(this.script);  
-
-
-  //So now we've got a map of the annotations. Yay! Can it be turned into function blocks?
-
-  //@annotation
-  //function  -- acorn identifies this as type FunctionDeclaration
-
-  //OR
-
-  //@annotation
-  //Resource.prototype.function -- acorn identifies this as type ExpressionStatement
-
-
-
-
-
-  //console.log(this.script);
 }
 
 Resource.prototype.parsed = function(){
@@ -82,7 +72,7 @@ Resource.prototype.parsed = function(){
 };
 
 Resource.prototype.parse = function(){
-	var resourceStream = new ResourceStream({encoding: "utf8", objectMode: true, script: this.script, annotations: this.annotations}), deferred = Q.defer();
+	var resourceStream = new ResourceStream({encoding: "utf8", objectMode: true, scriptBlocks: this.scriptBlocks, resourceName: this.name}), deferred = Q.defer();
 	this.stream.pipe(resourceStream);
 
 	resourceStream.on("data", function(chunk){

@@ -7,9 +7,16 @@
 var expect = require("chai").expect;
 
 describe("JacksonJS instantiation test", function(){
+  var app;
+  var express = require('express');
+  
+  beforeEach(function(){
+    app = express();
+  });
+
   it("should be able to configure JacksonJS with no options", function(){
     var Jackson = require("../../../src")();
-    var app = {};
+    
     var jackson = Jackson(app);
     expect(jackson.options).to.not.be.empty;
     expect(jackson.options.reloadOnChange).to.be.true;
@@ -21,7 +28,9 @@ describe("JacksonJS instantiation test", function(){
       resourcePath: "resources"
     });
 
-    var jackson = Jackson({});
+    
+
+    var jackson = Jackson(app);
     expect(jackson.options.reloadOnChange).to.be.false;
     expect(jackson.options.resourcePath).to.equal("resources");
   });
@@ -33,10 +42,10 @@ describe("JacksonJS instantiation test", function(){
     });
 
 
-    var app = {};
+    //var app = {};
     var sinon = require("sinon");
     var spy = sinon.spy(utils, "getResources");
-    var jackson = Jackson({});
+    var jackson = Jackson(app);
 
     var spyCall = spy.getCall(0);
     expect(spyCall.calledWith("resources")).to.be.true;

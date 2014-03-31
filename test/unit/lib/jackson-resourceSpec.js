@@ -10,6 +10,8 @@ describe("JacksonJS resource", function(){
     it("should be able to get a map of annotations", function(){
         var Resource = require(modulePath);
         var resource = new Resource(resourcePath);
+
+
         expect(resource.annotations.length).to.be.greaterThan(0);
         expect(resource.annotations[0].type).to.equal("PATH");
         expect(resource.annotations[1].type).to.equal("GET");
@@ -33,22 +35,23 @@ describe("JacksonJS resource", function(){
         expect(resource.scriptBlocks.blocks[scriptBlocksLength - 3].annotations.length).to.equal(2);
         expect(resource.scriptBlocks.blocks[scriptBlocksLength - 4].annotations.length).to.equal(0);
         expect(resource.scriptBlocks.blocks[scriptBlocksLength - 5].annotations.length).to.equal(2);
+        expect(resource.name).to.equal("Products");
+        expect(resource.basePath).to.equal("/products");
     });
 
-	describe("parse tests -- asynchronous", function(){
-		var resource;
+    describe("parse tests -- asynchronous", function(){
+        var resource;
 
-		beforeEach(function(){
-			var Resource = require(modulePath);
-			resource = new Resource(resourcePath);
-		});
+        beforeEach(function(){
+            var Resource = require(modulePath);
+            resource = new Resource(resourcePath);
+        });
 
-		xit("should be able to find the name of the resource", function(done){
-			
-
-            resource.parse().then(function(parsedResource){
-				done();
-			});
-		});		
-	});
+        xit("should be able to find the name of the resource", function(done){
+            resource.parse().then(function(){
+                done();
+            });
+        });
+    });
+            
 });

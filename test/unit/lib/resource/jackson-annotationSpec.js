@@ -6,9 +6,11 @@ describe("Jackson annotations", function(){
         var annotation = Annotation.fromLine(1, "= @GET");
         expect(annotation.type).to.equal("GET");
         expect(annotation.body).to.equal(null);
+        expect(annotation.category).to.equal("method");
         annotation = Annotation.fromLine(1, "= @path /products");
         expect(annotation.type).to.equal("PATH");
         expect(annotation.body).to.equal("/products");
+        expect(annotation.category).to.equal(null);
         annotation = Annotation.fromLine(1, "=      @path");
         expect(annotation.type).to.equal("PATH");
         annotation = Annotation.fromLine(1, "=   @  GET");  //this one should really be invalid

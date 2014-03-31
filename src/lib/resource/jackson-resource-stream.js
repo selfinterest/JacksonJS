@@ -16,15 +16,11 @@ function ResourceStream(options){
 
   Transform.call(this, options);
 
-  this.annotatedblocks = [];
-
-  this._annotations = [];
-  this._annotatedBlock = false;
-  this._blockType = null;
   this._lineCount = 1;      //important: acorn lines are not 0 indexed!
 
-  this.script = options.script;
-  this.annotations = options.annotations;
+  this.scriptBlocks = options.scriptBlocks;
+  this.resourceName = options.resourceName;
+
   if(!options) options = {};
 
 }
@@ -62,16 +58,19 @@ ResourceStream.prototype.mapAnnotationsToLine = function(script, line){
 };
 
 ResourceStream.prototype._transform = function(line, encoding, done){
-	var annotation, my = this, promises = [];
+    var annotation, my = this, promises = [];
 
 	//Each chunk is a line.
 	//We need to go through the script map until we find a match for this line.
 
     line = line.toString().trim();
 
-    this.script.forEach(function(s){
-        var annotations;
-        if(s.loc.start.line === my._lineCount){
+    this.scriptBlocks.forEach(function(s){
+        var annotations, matches;
+        if(s.startLine === my._lineCount && s.annotations.length > 0){      //this is an annotated line
+            if(s.type == "ExpressionStatement"){
+
+            }
             annotations = my.mapAnnotationsToLine(s, line);
             if(annotations){
                 my.push(annotations);

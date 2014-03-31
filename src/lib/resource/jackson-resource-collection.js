@@ -13,8 +13,18 @@ ResourceCollection.prototype.add = function(resource){
   this._resources.push(resource);
 };
 
-ResourceCollection.prototype.process = function(){
-
+ResourceCollection.prototype.compile = function(app){
+  var module;
+  this._resources.forEach(function(resource){
+    module = new resource.module();
+    resource.scriptBlocks.blocks.forEach(function(block){
+      block.annotations.forEach(function(annotation){
+        if(annotation.category){
+          annotation.categoryFunction(app, module, resource, block, annotation);
+        }
+      });
+    });
+  });
 };
 
 ResourceCollection.prototype.parseAll = function(){

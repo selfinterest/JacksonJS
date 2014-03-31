@@ -26,6 +26,31 @@ ScriptBlock.setAnnotations = function(a){
     this.annotations = a;
 };
 
+ScriptBlock.prototype.isAnnotated = function(){
+    return this.annotations.length > 0;
+};
+
+ScriptBlock.prototype.hasAnnotationOfType = function(type){
+    var flag = null, count = 0;
+    type = type.toUpperCase();
+    this.annotations.forEach(function(a){
+        
+    });
+}
+ScriptBlock.prototype.hasPathAnnotation = function(){
+    var flag = null, count = 0;
+    this.annotations.forEach(function(a){
+        if(a.type == "PATH" && flag === null)  flag = count;
+        count++;
+    });
+    if(flag !== null){
+        return this.annotations[flag];
+    } else {
+        return null;
+    }
+    
+};
+
 ScriptBlock.prototype.assignAnnotation = function(a){
     this.annotations.push(a);
     a.assigned = true;
@@ -39,6 +64,7 @@ ScriptBlock.FunctionDeclaration = function(s){
 
 ScriptBlock.ExpressionStatement = function(s){
     ScriptBlock.call(this, s);
+    this.functionToCall = s.expression.left.property.name;
 
 };
 
