@@ -39,7 +39,8 @@ Annotation.types.method = ["GET", "POST", "PUT", "DELETE", function(app, resourc
             }
         });    
     }
-   
+
+
   
     if(!thePath) {
         thePath = resource.basePath;
@@ -53,12 +54,13 @@ Annotation.types.method = ["GET", "POST", "PUT", "DELETE", function(app, resourc
     //Also, if there are two slashes at the beginning, replace them with one
     thePath = thePath.replace(/\/\//, "/");
     console.log("Adding "+thePath+", with method: "+annotation.type);
+
+    var resourceFunction = resource.instance[script.functionToCall];
+
+    //Finally, we also need to do dependency injection
+    var inject = script.hasInject(resourceFunction);
     app[annotation.type.toLowerCase()](thePath,  mwFunctions, resource.instance[script.functionToCall]);
-    /*if(mw){ //middleware added
-        app[annotation.type.toLowerCase()](thePath, middleware[mw], resource.instance[script.functionToCall]);    
-    } else {
-        app[annotation.type.toLowerCase()](thePath,  resource.instance[script.functionToCall]); 
-    }*/
+    
     
 }];
 

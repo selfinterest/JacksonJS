@@ -61,12 +61,43 @@ ScriptBlock.prototype.hasMiddleware = function(){
 
     if(mw) {
         mw = mw.split(/[ ,]+/);
-        
+
     };
 
 
     return mw;
 }
+
+ScriptBlock.prototype.hasInject = function(){
+    var inject = null;
+    this.annotations.forEach(function(a){
+        if(a.type == "INJECT" && inject === null){
+            inject = a;
+        }
+    });
+
+    //We also parse the injector here, if we got one.
+    //@inject need not have a body. If we don't have one, we do this:
+
+    /*f(inject){
+        if(inject.body){
+            return function(req, res)
+        } else {
+
+        }
+    }
+
+    if(inject){
+        inject = inject.match( /(\S+)\s?\((\.+)\)/ );
+        if(!inject){
+            throw new Error("Malformed injection annotation.");
+        } else {
+
+        }
+    }*/
+    inject = null;
+    return inject;
+};
 
 ScriptBlock.prototype.assignAnnotation = function(a){
     this.annotations.push(a);

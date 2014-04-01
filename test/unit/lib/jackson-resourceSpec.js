@@ -25,7 +25,7 @@ describe("JacksonJS resource", function(){
 
         expect(resource.scriptBlocks.blocks[0].annotations.length).to.equal(0);
         expect(resource.scriptBlocks.blocks[1].annotations.length).to.equal(1); //one annotation. See products.js.
-        expect(resource.scriptBlocks.blocks[2].annotations.length).to.equal(2);
+        expect(resource.scriptBlocks.blocks[3].annotations.length).to.equal(3); //three annotations, including the middleware one.
 
         var scriptBlocksLength = resource.scriptBlocks.blocks.length;
 

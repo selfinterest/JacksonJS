@@ -5,7 +5,8 @@ function Customer(){
 
 //= @GET
 //= @path /:id
-Customer.prototype.getOne = function(req, res){
+//= @inject
+Customer.prototype.getOne = function(id, req, res){
     res.send("Sending one customer");
 };
 

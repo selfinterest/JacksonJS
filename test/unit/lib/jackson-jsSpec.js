@@ -16,7 +16,14 @@ describe("JacksonJS instantiation test", function(){
 
   it("should be able to configure JacksonJS with no options", function(){
     var Jackson = require("../../../src")();
-    
+    Jackson().registerMiddleware("dummy", function(req, res, next){
+        console.log("Some dummy middleware");
+        next();
+    })
+    .registerMiddleware("stupid", function(req, res, next){
+        console.log("More dummy middleware");
+        next();
+    });
     var jackson = Jackson(app);
     expect(jackson.options).to.not.be.empty;
     expect(jackson.options.reloadOnChange).to.be.true;
