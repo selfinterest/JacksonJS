@@ -1,13 +1,13 @@
 {
   "name": "JacksonJS",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "REST for Express",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Terrence C. Watson (parliamentaryterrence@gmail.com)",
+  "license": "MIT",
   "dependencies": {
     "underscore": "^1.6.0",
     "grunt": "^0.4.4",
