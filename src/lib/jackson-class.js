@@ -9,6 +9,7 @@ var utils = require("./jackson-utils.js");
 
 function JacksonConstructor(options, app){
   this.options = options;
+ 
   this.app = app;
 
   this.resources = utils.getResources(this.options.resourcePath);
@@ -17,19 +18,16 @@ function JacksonConstructor(options, app){
   if(this.resources.length < 1){
     throw new NoResourcesException(options);
   }
+
+  this.resources.middleware = JacksonConstructor.middleware || {};
   this.resources.compile(app);
 
 }
 
-JacksonConstructor.prototype.compileResources = function(){
-
-};
-
-/**
- * Starts Jackson. Should return a promise that is only fulfilled when EVERYTHING is done.
- */
-JacksonConstructor.prototype.start = function(){
-
-};
-
+/*JacksonConstructor.prototype.registerMiddleware = function(id, middlewareFn){
+    if(!this.middleware) this.middleware = {};
+    this.middleware[id] = middlewareFn;
+    console.log("Registered middleware with id "+id);
+    return this;
+};*/
 module.exports = JacksonConstructor;

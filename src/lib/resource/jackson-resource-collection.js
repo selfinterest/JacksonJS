@@ -14,18 +14,21 @@ ResourceCollection.prototype.add = function(resource){
 };
 
 ResourceCollection.prototype.compile = function(app){
-  var module;
+  var module, my = this;
+
   this._resources.forEach(function(resource){
-    module = new resource.module();
+    resource.instance = new resource.module();
+    resource.middleware = my.middleware;          //we add the middleware as late as possible.
     resource.scriptBlocks.blocks.forEach(function(block){
       block.annotations.forEach(function(annotation){
         if(annotation.category){
-          annotation.categoryFunction(app, module, resource, block, annotation);
+          annotation.categoryFunction(app, resource, block, annotation);
         }
       });
     });
   });
 };
+
 
 ResourceCollection.prototype.parseAll = function(){
 	return Q.all(_.map(this._resources, function(resource){

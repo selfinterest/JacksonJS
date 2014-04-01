@@ -69,7 +69,7 @@ ResourceStream.prototype._transform = function(line, encoding, done){
         var annotations, matches;
         if(s.startLine === my._lineCount && s.annotations.length > 0){      //this is an annotated line
             if(s.type == "ExpressionStatement"){
-
+                
             }
             annotations = my.mapAnnotationsToLine(s, line);
             if(annotations){

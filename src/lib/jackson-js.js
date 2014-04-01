@@ -4,12 +4,11 @@
  * Time: 10:08 PM
  */
 
-var _ = require("underscore"), path = require("path");
+var _ = require("underscore"), path = require("path"), JacksonConstructor = require("./jackson-class.js");
 
 function Jackson(options){
   if(!options) options = {};
-
-  var JacksonConstructor = require("./jackson-class.js");
+  
 
   options = _.defaults(options, {
     resourcePath: path.join("resources"),
@@ -19,10 +18,23 @@ function Jackson(options){
 
 
   return function(app){
-    return new JacksonConstructor(options, app);
-  }
+    if(app){
+        return new JacksonConstructor(options, app);    
+    } else {
+        return Jackson;
+    }
+    
+  };
 
 }
+
+
+Jackson.registerMiddleware = function(id, middlewareFn){
+    console.log("Registering middleware with id: " + id);
+    if(!JacksonConstructor.middleware) JacksonConstructor.middleware = {};
+    JacksonConstructor.middleware[id] = middlewareFn;
+    return Jackson;
+};
 
 Jackson.prototype.utils = require("./jackson-utils");
 

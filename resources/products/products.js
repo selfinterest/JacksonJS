@@ -14,8 +14,15 @@
 
 	}
 
+    //This can now be used as middleware
+    Products.scan = function(req, res, next){
+        console.log("The scanning middleware");
+        next();
+    };
+
     //= @GET
     //= @path /
+    //= @middleware dummy, scan, stupid
 	Products.prototype.getProducts = function(req, res){
         res.send("Sending products.");
 	};

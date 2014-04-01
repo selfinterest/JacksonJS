@@ -51,6 +51,23 @@ ScriptBlock.prototype.hasPathAnnotation = function(){
     
 };
 
+ScriptBlock.prototype.hasMiddleware = function(){
+    var mw = null, count = 0;
+    this.annotations.forEach(function(a){    
+        if(a.type == "MIDDLEWARE" && mw === null){
+            mw = a.body;
+        }
+    });
+
+    if(mw) {
+        mw = mw.split(/[ ,]+/);
+        
+    };
+
+
+    return mw;
+}
+
 ScriptBlock.prototype.assignAnnotation = function(a){
     this.annotations.push(a);
     a.assigned = true;

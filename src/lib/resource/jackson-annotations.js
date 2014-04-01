@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var _ = require("underscore");
 
 function Annotation(options){
@@ -9,14 +12,35 @@ function Annotation(options){
 
 Annotation.regex = {};
 Annotation.regex.type = /@([A-Za-z]+)\s?/;
-Annotation.regex.body = /@[A-zA-z]+\s+(\S+)/;
+Annotation.regex.body = /@[A-zA-z]+\s+(.+)/;
 Annotation.regex.typeAndBody = /@([A-Za-z]+)\s+?(\S+)/;
 
 Annotation.types = {};
 
-Annotation.types.method = ["GET", "POST", "PUT", "DELETE", function(app, module, resource, script, annotation){
+Annotation.types.method = ["GET", "POST", "PUT", "DELETE", function(app, resource, script, annotation){
     //method = method.toLowerCase();
     var thePath = script.hasPathAnnotation();
+
+    var mw = script.hasMiddleware();
+
+    //We need to get an array of middleware functions from mw
+    var mwFunctions = [];
+    if(mw){
+        mw.forEach(function(m){         //m is a string like "authenticate" or "scan"
+            //We check both the global middleware object on resource AND local methods on the module
+            if(!resource.middleware[m] && !resource.module[m]) throw new Error("Middleware "+m+" is not defined.");
+            //Local middleware has priority
+            if(resource.module[m] && typeof(resource.module[m] == "function")) {
+                mwFunctions.push(resource.module[m]);
+            } else if (resource.middleware[m] && typeof(resource.middleware[m] == "function")){
+                mwFunctions.push(resource.middleware[m]);
+            } else {
+                throw new Error("Middleware "+m+" is not a function.");
+            }
+        });    
+    }
+   
+  
     if(!thePath) {
         thePath = resource.basePath;
     } else {
@@ -29,7 +53,13 @@ Annotation.types.method = ["GET", "POST", "PUT", "DELETE", function(app, module,
     //Also, if there are two slashes at the beginning, replace them with one
     thePath = thePath.replace(/\/\//, "/");
     console.log("Adding "+thePath+", with method: "+annotation.type);
-    app[annotation.type.toLowerCase()](thePath, module[script.functionToCall]);
+    app[annotation.type.toLowerCase()](thePath,  mwFunctions, resource.instance[script.functionToCall]);
+    /*if(mw){ //middleware added
+        app[annotation.type.toLowerCase()](thePath, middleware[mw], resource.instance[script.functionToCall]);    
+    } else {
+        app[annotation.type.toLowerCase()](thePath,  resource.instance[script.functionToCall]); 
+    }*/
+    
 }];
 
 

@@ -11,6 +11,22 @@
 
  var express = require('express');
  var app = express();
- Jackson(app);      //routes all set up!
+
+
+Jackson()
+    .registerMiddleware("dummy", function(req, res, next){
+        console.log("Some dummy middleware");
+        next();
+    })
+    .registerMiddleware("stupid", function(req, res, next){
+        console.log("More dummy middleware");
+        next();
+    });
+
+ Jackson(app);
+    /*.registerMiddleware("dummy", function(req, res, next){
+        console.log("Some dummy middleware");
+        next();
+    });*/
 
  app.listen(3000);
