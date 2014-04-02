@@ -19,15 +19,10 @@ function JacksonConstructor(options, app){
     throw new NoResourcesException(options);
   }
 
-  this.resources.middleware = JacksonConstructor.middleware || {};
+  //this.resources.middleware = JacksonConstructor.middleware || {};
+ // this.resources.expressParameters = JacksonConstructor.expressParameters || {"request": "req", "response": "res", "next": "next"};
   this.resources.compile(app);
 
 }
 
-/*JacksonConstructor.prototype.registerMiddleware = function(id, middlewareFn){
-    if(!this.middleware) this.middleware = {};
-    this.middleware[id] = middlewareFn;
-    console.log("Registered middleware with id "+id);
-    return this;
-};*/
 module.exports = JacksonConstructor;

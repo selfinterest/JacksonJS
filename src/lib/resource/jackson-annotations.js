@@ -1,7 +1,7 @@
 /*jslint node: true */
 "use strict";
 
-var _ = require("underscore");
+var _ = require("underscore"), config = require("../jackson-config.js");
 
 function Annotation(options){
 	this.type = options.type;
@@ -27,20 +27,18 @@ Annotation.types.method = ["GET", "POST", "PUT", "DELETE", function(app, resourc
     var mwFunctions = [];
     if(mw){
         mw.forEach(function(m){         //m is a string like "authenticate" or "scan"
-            //We check both the global middleware object on resource AND local methods on the module
-            if(!resource.middleware[m] && !resource.module[m]) throw new Error("Middleware "+m+" is not defined.");
+            //We check both the global middleware config object AND local methods on the module
+            if(!config.middleware[m] && !resource.module[m]) throw new Error("Middleware "+m+" is not defined.");
             //Local middleware has priority
             if(resource.module[m] && typeof(resource.module[m] == "function")) {
                 mwFunctions.push(resource.module[m]);
-            } else if (resource.middleware[m] && typeof(resource.middleware[m] == "function")){
-                mwFunctions.push(resource.middleware[m]);
+            } else if (config.middleware[m] && typeof(config.middleware[m] == "function")){
+                mwFunctions.push(config.middleware[m]);
             } else {
                 throw new Error("Middleware "+m+" is not a function.");
             }
         });    
     }
-
-
   
     if(!thePath) {
         thePath = resource.basePath;
@@ -58,8 +56,13 @@ Annotation.types.method = ["GET", "POST", "PUT", "DELETE", function(app, resourc
     var resourceFunction = resource.instance[script.functionToCall];
 
     //Finally, we also need to do dependency injection
-    var inject = script.hasInject(resourceFunction);
-    app[annotation.type.toLowerCase()](thePath,  mwFunctions, resource.instance[script.functionToCall]);
+    var inject = script.hasInject(resourceFunction, resource.instance);
+
+    if(inject) {
+        resourceFunction = inject;           //if injection was required, we replace the resourceFunction with the injected function
+    
+    }
+    app[annotation.type.toLowerCase()](thePath,  mwFunctions, resourceFunction);
     
     
 }];

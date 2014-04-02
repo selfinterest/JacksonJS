@@ -66,36 +66,88 @@ ScriptBlock.prototype.hasMiddleware = function(){
 
 
     return mw;
-}
+};
 
-ScriptBlock.prototype.hasInject = function(){
-    var inject = null;
+/**
+ * Checks to see if this script block is annotated with @INJECT
+ * @param  {function}  resourceFunction
+ * @param  {Resource} resourceInstance An instance of the resource (will be used as the "this" value when injection occurs)
+ * @return {null|function} Null if no @INJECT middleware. Otherwise, the injector function.
+ */
+ScriptBlock.prototype.hasInject = function(resourceFunction, resourceInstance){
+    
+    //Default injection order depends on the type of request.
+    //And, of course, these components may not exist on the request object in all cases.
+    var defaultInjectionOrder = {
+        "GET":  ["params", "query", "session", "body"],
+        "POST": ["body", "params", "query", "session"],
+        "PUT": ["params", "body", "query", "session"],
+        "DELETE": ["params", "query", "session", "body"]
+    };
+
+    /**
+     * A regular expression to strip comments from a block of JavaScript.
+     * @type {RegExp}
+     */
+    var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+    
+    /**
+     * Gets the names of the parameters from a function
+     * @param {function} func
+     * @return {string[]} The list of parameters
+     */
+    function getParamNames(func) {
+        var fnStr = func.toString().replace(STRIP_COMMENTS, '');
+        var result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(/([^\s,]+)/g);
+        if(result === null)
+            result = [];
+        return result;
+    };
+
+    var inject = null, resourceFunctionString, injectionOrder;
+
     this.annotations.forEach(function(a){
-        if(a.type == "INJECT" && inject === null){
+        if(a.type == "INJECT" && inject === null){          //the inject middleware is present
             inject = a;
+        } else if (a.type !== "INJECT"){                            //could be the method annotation
+            if(defaultInjectionOrder[a.type]){
+                injectionOrder = defaultInjectionOrder[a.type];
+            }
         }
     });
 
-    //We also parse the injector here, if we got one.
-    //@inject need not have a body. If we don't have one, we do this:
-
-    /*f(inject){
-        if(inject.body){
-            return function(req, res)
-        } else {
-
+    if(inject){                                                                 //we have an injection tag
+        resourceFunctionParameters = getParamNames(resourceFunction);
+        if(inject.body){                                                    //the injection tag has a body
+            defaultInjectionOrder = inject.body.split(/[ ,]+/);     //we ignore the default order from the method and rely on the user provided one
         }
+   
+        //Fill out the injector function
+        inject = function(req, res, next){
+            var newArgumentsList = [];
+            var functionParameters = resourceFunctionParameters.slice(0);           //we make a copy of the array, because we do not want to modify the original
+            defaultInjectionOrder.forEach(function(order){
+                if(req[order]){                                             //the property on the request object is defined.
+                    functionParameters.forEach(function(fnParam, index){
+                        if(fnParam){                                                                //if fnparam is null, obviously we can't inject it
+                            if(req[order][fnParam]){                                          
+                                newArgumentsList.push(req[order][fnParam]);
+                                functionParameters[index] = null;                       //at most, we inject a parameter once
+                            }
+                        }                   
+                    });
+                }
+            });
+            var originalArguments = Array.prototype.slice.call(arguments);
+            newArgumentsList = newArgumentsList.concat(originalArguments);  //add the original arguments to the end of the array
+            //Call the original function with the new parameters
+            var result = resourceFunction.apply(resourceInstance, newArgumentsList);         //resourceInstance is the this value, thus preserving it.
+            if(result) res.send(result);
+        };
+        
+          
     }
-
-    if(inject){
-        inject = inject.match( /(\S+)\s?\((\.+)\)/ );
-        if(!inject){
-            throw new Error("Malformed injection annotation.");
-        } else {
-
-        }
-    }*/
-    inject = null;
+    
     return inject;
 };
 

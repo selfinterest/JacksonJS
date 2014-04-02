@@ -18,7 +18,7 @@ ResourceCollection.prototype.compile = function(app){
 
   this._resources.forEach(function(resource){
     resource.instance = new resource.module();
-    resource.middleware = my.middleware;          //we add the middleware as late as possible.
+    //resource.middleware = my.middleware;          //we add the middleware as late as possible.
     resource.scriptBlocks.blocks.forEach(function(block){
       block.annotations.forEach(function(annotation){
         if(annotation.category){
