@@ -1,3 +1,4 @@
+var JacksonHttpError = require ("../../src/lib/exceptions/jackson-exceptions.js").HttpError;
 //= @path /customer
 function Customer(){
 
@@ -11,7 +12,15 @@ Customer.prototype.getOne = function(id, message){
     //res.send("Sending one customer with id" + id);
 
     //Or this:
-    return "Sending one customer with id " + id + ". The message is: "+message;        //necessarily, this does not allow for asynchronous operations.
+    if(id !== "Heather"){
+        return "Sending one customer with id " + id + ". The message is: "+message;        //necessarily, this does not allow for asynchronous operations.    
+    } else {
+        throw new JacksonHttpError({
+            status: 400,
+            message: "Invalid customer id"
+        });
+    }
+    
 };
 
 module.exports = Customer;

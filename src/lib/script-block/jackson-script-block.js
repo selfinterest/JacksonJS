@@ -1,5 +1,5 @@
 var util = require("util");
-
+var JacksonExceptions = require("../exceptions/jackson-exceptions.js");
 
 function ScriptBlock(s){
     if(!(this instanceof ScriptBlock)){
@@ -127,22 +127,32 @@ ScriptBlock.prototype.hasInject = function(resourceFunction, resourceInstance){
             var newArgumentsList = [];
             var functionParameters = resourceFunctionParameters.slice(0);           //we make a copy of the array, because we do not want to modify the original
             defaultInjectionOrder.forEach(function(order){
-                if(req[order]){                                             //the property on the request object is defined.
-                    functionParameters.forEach(function(fnParam, index){
-                        if(fnParam){                                                                //if fnparam is null, obviously we can't inject it
-                            if(req[order][fnParam]){                                          
-                                newArgumentsList.push(req[order][fnParam]);
-                                functionParameters[index] = null;                       //at most, we inject a parameter once
+                if(req[order]){                                                                     //if the property on the request object is defined.
+                    functionParameters.forEach(function(fnParam, index){ //then iterate over the parameters in the resource function
+                        if(fnParam){                                                                //if fnparam is null, it was already injected
+                            if(req[order][fnParam]){                                          //e.g. req.params.id
+                                newArgumentsList.push(req[order][fnParam]);   //add the argument to the argumentsList array
+                                functionParameters[index] = null;                       //at most, we inject a parameter once, so set it to null once injected
                             }
                         }                   
                     });
                 }
             });
-            var originalArguments = Array.prototype.slice.call(arguments);
+            var originalArguments = Array.prototype.slice.call(arguments);          //convert the original arguments list to a real JS array
             newArgumentsList = newArgumentsList.concat(originalArguments);  //add the original arguments to the end of the array
-            //Call the original function with the new parameters
-            var result = resourceFunction.apply(resourceInstance, newArgumentsList);         //resourceInstance is the this value, thus preserving it.
-            if(result) res.send(result);
+            try {
+                //Call the original function with the new parameters
+                var result = resourceFunction.apply(resourceInstance, newArgumentsList);         //resourceInstance is the this value, thus preserving it.
+                if(result) res.send(result);    
+            } catch (e) {
+                if(e instanceof JacksonExceptions.HttpError){
+                    res.status(e.status || 400).send(e.message);
+                } else {                    //rethrow the error
+                    throw e;
+                }
+                    
+            }
+            
         };
         
           

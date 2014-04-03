@@ -1,8 +1,11 @@
 module.exports = {
   NoResourcesException: function(options) {
-    return {
-      name: "No resources error",
-      message: "No resources found in the defined resource path: "+options.resourcePath
-    }
+      this.name = "No resources error";
+      this.message = "No resources found in the defined resource path: "+options.resourcePath;
+    },
+  HttpError: function(options){
+    this.status = options.status || 400;
+    this.message = options.message || "Invalid request";
+    this.name = "Jackson HTTP error";
   }
-}
+};
