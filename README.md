@@ -45,7 +45,7 @@ You can simply put through together a plain old JavaScript object and annotate i
     //= @path /:id
     //= @inject params
     Products.prototype.getOne = function(id){
-      res.send("Sending product with id " + id);
+      return "Sending product with id " + id;
     };
 
     //= @POST
@@ -53,8 +53,8 @@ You can simply put through together a plain old JavaScript object and annotate i
     //= @middleware authenticate
     //= @inject body
     Products.prototype.makeOne = function(product){
-        db.models.Product.create(product).then(function(product){
-            res.send(product);
+        return db.models.Product.create(product).then(function(product){
+            return "Product was created with id " + product.id;
         });
     }
 
