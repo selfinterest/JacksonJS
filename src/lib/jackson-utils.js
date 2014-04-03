@@ -1,3 +1,8 @@
+//Some prototype additions because that's cool
+String.prototype.splitOnCommasIgnoreSpaces = function(){
+  
+};
+
 var glob = require("glob"),
   path = require("path"),
   _ = require("underscore"),

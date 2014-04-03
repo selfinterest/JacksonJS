@@ -2,8 +2,35 @@ JacksonJS
 =========
 JacksonJS is a package for Express that allows you to create routes using JAX-RS style annotations. With JacksonJS, you can define your routing logic in _declarative_ fashion, by annotating functions.
 
-With JacksonJS, creating routes is as simple as this:
+How it works
+------------------
+JacksonJS simplifies the creation and maintenance of Node.js/Express applications. Creation is simplified because REST routes can be quickly put  together using annotations. Instead of this:
+    
+    function authenticate(req, res, next){
+        //Authentication logic
 
+        next();
+    }
+
+    app.get("/products/:id", products.getOne);
+    app.post("/products", authenticate products.makeOne);
+    
+    products = {};
+
+    products.getOne = function(req, res){
+        var productId = req.params.id;
+        
+        ...
+    }
+
+    products.makeOne = function(req, res){
+        var product = req.body.product;
+
+        ...
+    }
+
+You can simply put through together a plain old JavaScript object and annotate it:
+    
     //= @path /products
     function Products(){
     
@@ -15,52 +42,24 @@ With JacksonJS, creating routes is as simple as this:
     };
 
     //= @GET
-    //= @path /
-    Products.prototype.getProducts = function(req, res){
-      res.send("Sending products.");
+    //= @path /:id
+    //= @inject params
+    Products.prototype.getOne = function(id){
+      res.send("Sending product with id " + id);
     };
 
     //= @POST
     //= @path /
     //= @middleware authenticate
-    Products.prototype.createProduct = function(req, res){
-        res.send("Creating a product.");
+    //= @inject body
+    Products.prototype.makeOne = function(product){
+        db.models.Product.create(product).then(function(product){
+            res.send(product);
+        });
     }
 
-JacksonJS is smart enough that it can parse resource files annotated in this way and generate the corresponding routing logic, including multiple layers of middleware.
-
-In addition, JacksonJS provides an @inject annotation that parses parameters (URL parameters, query parameters, etc.) for you and injects the values into the callback function. For example, you can do something like this:
-
-    //= @path /customer
-    function Customer(){
-
-    }
-
-    //= @GET
-    //= @path /:id
-    //= @inject params, query
-    Customer.prototype.getOne = function(id, message){
-        //Suppose the URL is: /customer/12?message=Hello
-        //Because @inject was used, id = 12 and message = "Hello".
-
-        //Then we can do this:
-        //res.send("Sending one customer with id" + id);
-
-        //Or this:
-        return "Sending one customer with id " + id + ". The message is: "+message; 
-    };
-
-    module.exports = Customer;
-
-The rationale
-------------------
-I got tired of writing boilerplate Express code, and I always loved the way JAX-RS does REST. Also, using annotations makes the relationship between routes and functionality more obvious, in my view. The @inject annotation was inspired by AngularJS. It's not QUITE Dependency Injection, but it is close. Personally, I hate doing things like: `var id = req.params.id` at the beginning of my callback functions.
+Maintenance of your Node.js/Express application is simplified because the relationship between routes and business logic is immediately clear. You know immediately that a GET request to /products/:id maps onto the getOne function, etc. JacksonJS keeps code organized and clean. The annotation style is designed to be both functional and self-documenting.
 
 The future
 --------------
-More tests and cleaner code. JacksonJS isn't ready for primetime yet.
-
-But beyond that, I'd like to use the annotations stuff I've developed to automatically generate AngularJS resources, which could then be used client-side. This would simplify the relationship between client and server.
-
-
- 
+More tests and cleaner code. JacksonJS isn't ready for primetime yet. I also plan to introduce a @model annotation that would map REST resources to Mongoose models. More on that later.

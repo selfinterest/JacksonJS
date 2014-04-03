@@ -146,7 +146,7 @@ ScriptBlock.prototype.hasInject = function(resourceFunction, resourceInstance){
                 if(result) res.send(result);    
             } catch (e) {
                 if(e instanceof JacksonExceptions.HttpError){
-                    res.status(e.status || 400).send(e.message);
+                    res.status(e.status).send(e.message);
                 } else {                    //rethrow the error
                     throw e;
                 }
