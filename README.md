@@ -29,7 +29,7 @@ JacksonJS simplifies the creation and maintenance of Node.js/Express application
         ...
     }
 
-You can simply put through together a plain old JavaScript object and annotate it:
+You can simply annotate a plain old JavaScript object:
     
     //= @path /products
     function Products(){
